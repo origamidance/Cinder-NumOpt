@@ -10,7 +10,7 @@ SET_OPTION(NLOPT_OCTAVE OFF)
 SET_OPTION(NLOPT_MATLAB OFF)
 SET_OPTION(NLOPT_GUILE OFF)
 SET_OPTION(NLOPT_SWIG OFF)
-add_subdirectory(lib/nlopt nlopt)
+# add_subdirectory(lib/nlopt nlopt)
 add_executable(testnlopt src/test.cpp)
 
 find_package(Eigen3 REQUIRED)
