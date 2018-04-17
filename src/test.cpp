@@ -95,11 +95,7 @@ double myfunc(const std::vector<double> &x, std::vector<double> &grad, void *fun
   double fx;
   stan::math::gradient(functor, mX, fx, grad_fx);
   if (!grad.empty()) {
-    grad[0]=grad_fx[0];
-    grad[1]=grad_fx[1];
-    std::cout<<"grad="<<grad_fx.transpose()<<"\n";
-    // grad[0] = 0.0;
-    // grad[1] = 0.5 / sqrt(x[1]);
+    grad=std::vector<double>(grad_fx.data(),grad_fx.data()+grad_fx.size());
   }
   return functor(mX);
 }
