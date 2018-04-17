@@ -1,0 +1,6 @@
+[submodule "lib/nlopt"]
+	path = lib/nlopt
+	url = https://github.com/stevengj/nlopt.git
+[submodule "lib/stan/math"]
+	path = lib/stan/math
+	url = https://github.com/stan-dev/math.git
