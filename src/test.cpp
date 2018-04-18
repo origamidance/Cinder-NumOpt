@@ -5,55 +5,6 @@
 #include <stan/math.hpp>
 #include <Eigen/Dense>
 
-// typedef struct {
-//   double a, b;
-// } my_constraint_data;
-
-// double myfunc(const std::vector<double> &x, std::vector<double> &grad,
-//               void *my_func_data) {
-//   if (!grad.empty()) {
-//     grad[0] = 0.0;
-//     grad[1] = 0.5 / sqrt(x[1]);
-//   }
-//   return sqrt(x[1]);
-// }
-// double myconstraint(unsigned n, const double *x, double *grad, void *data)
-// {
-//   my_constraint_data *d = (my_constraint_data *) data;
-//   double a = d->a, b = d->b;
-//   if (grad) {
-//     grad[0] = 3 * a * (a*x[0] + b) * (a*x[0] + b);
-//     grad[1] = -1.0;
-//   }
-//   return ((a*x[0] + b) * (a*x[0] + b) * (a*x[0] + b) - x[1]);
-//  }
-
-// int main() {
-
-//   std::vector<double> lb(2);
-//   lb[0] = -HUGE_VAL;
-//   lb[1] = 0;
-
-//   nlopt::opt opt(nlopt::LD_MMA, 2);
-//   opt.set_lower_bounds(lb);
-//   opt.set_min_objective(myfunc, NULL);
-//   my_constraint_data data[2] = {{2, 0}, {-1, 1}};
-//   opt.add_inequality_constraint(myconstraint, &data[0], 1e-8);
-//   opt.add_inequality_constraint(myconstraint, &data[1], 1e-8);
-//   opt.set_xtol_rel(1e-4);
-//   std::vector<double> x(2);
-//   x[0] = 1.234;
-//   x[1] = 5.678;
-//   double minf;
-//   try {
-//     nlopt::result result = opt.optimize(x, minf);
-//     std::cout << "found minimum at f(" << x[0] << "," << x[1]
-//               << ") = " << std::setprecision(10) << minf << std::endl;
-//   } catch (std::exception &e) {
-//     std::cout << "nlopt failed: " << e.what() << std::endl;
-//   }
-//   return 0;
-// }
 using Eigen::Matrix;
 using Eigen::Dynamic;
 struct normal_ll {
@@ -68,7 +19,9 @@ struct normal_ll {
     return lp;
   }
 };
-struct objfunc{
+
+class objfunc{
+public:
   template <typename T>
   T operator()(const Matrix<T,Dynamic, 1> &x) const{
     T lp=0;
@@ -77,18 +30,20 @@ struct objfunc{
   }
 };
 
-struct constraint{
+class constraint{
+public:
   template <typename T>
   T operator()(const Matrix<T,Dynamic, 1> &x) const{
     T lp=0;
-    lp+=x.transpose()*x;
+    lp+=x.norm()-10;
     return lp;
   }
 };
 
-// template <typename T>
+template <typename T>
 double myfunc(const std::vector<double> &x, std::vector<double> &grad, void *func) {
-  objfunc& functor= reinterpret_cast<objfunc&>(func);
+  T& functor= reinterpret_cast<T&>(func);
+  // objfunc& functor= reinterpret_cast<objfunc&>(func);
   // objfunc* functor=func;
   Matrix<double,Dynamic, 1> mX=Eigen::Map<const Matrix<double,Dynamic, 1>>(&x[0],x.size(),1);
   Matrix<double, Dynamic, 1> grad_fx;
@@ -101,43 +56,38 @@ double myfunc(const std::vector<double> &x, std::vector<double> &grad, void *fun
 }
 
 int main(){
-  // Matrix<double, Dynamic, 1> y(3);
-  // y << 1.3, 2.7, -1.9;
-  // normal_ll f(y);
-  // Matrix<double, Dynamic, 1> x(2);
-  // x << 1.3, 2.9;
-  // double fx;
-  // Matrix<double, Dynamic, 1> grad_fx;
-  // stan::math::gradient(f, x, fx, grad_fx);
-  // std::cout<<"fx="<<fx<<"\n";
-  // std::cout<<"grad_fx="<<grad_fx.transpose()<<"\n";
-  // std::cout<<"testf="<<f(x)<<"\n";
 
-  // std::vector<double> lb(2);
-  // lb[0] = -HUGE_VAL;
-  // lb[1] = 0;
+  std::vector<double> lb(2);
+  lb[0] = -HUGE_VAL;
+  lb[1] = -HUGE_VAL;
   objfunc testfunc;
+  constraint testcons;
 
-  nlopt::opt opt(nlopt::LD_LBFGS,2);
+  // nlopt::opt opt(nlopt::LD_LBFGS,2);
   // nlopt::opt opt(nlopt::LD_MMA, 2);
+  nlopt::opt opt(nlopt::LD_SLSQP,2);
   // opt.set_lower_bounds(lb);
-  opt.set_min_objective(myfunc,&testfunc);
+  opt.set_max_objective(myfunc<decltype(testfunc)>,&testfunc);
   // // my_constraint_data data[2] = {{2, 0}, {-1, 1}};
-  // opt.add_inequality_constraint(myfunc,&testfunc, 1e-8);
+  opt.add_equality_constraint(myfunc<decltype(testcons)>, &testcons, 1e-8);
+  // opt.add_equality_constraint(mycons, &testcons, 1e-8);
+  // opt.add_inequality_constraint(mycons,&testcons, 1e-8);
   // opt.add_inequality_constraint(myfunc,&testfunc, 1e-8);
   opt.set_xtol_rel(1e-4);
   std::vector<double> x(2);
   x[0] = 1;
   x[1] = 1;
   std::vector<double> y(2);
-  std::cout<<"func value="<<myfunc(x,y,&testfunc);
   double minf;
   try {
     nlopt::result result = opt.optimize(x, minf);
     std::cout << "found minimum at f(" << x[0] << "," << x[1]
-              << ") = " << std::setprecision(10) << minf << std::endl;
+              << ") = " << minf << std::endl;
+    std::cout<<"func value="<<myfunc<decltype(testfunc)>(x,y,&testfunc)<<"\n";
+    std::cout<<"cons value="<<myfunc<decltype(testcons)>(x,y,&testcons)<<"\n";
   } catch (std::exception &e) {
     std::cout << "nlopt failed: " << e.what() << std::endl;
   }
+
   return 0;
 }
