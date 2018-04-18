@@ -4,11 +4,11 @@ if( NOT TARGET Cinder-NumOpt )
   message("CINDER PATH= ${CINDER_PATH}")
   set(STANMATH_PATH ${CINDER-NUMOPT_PATH}/lib/stan/math)
   list(APPEND CINDER-NUMOPT_SOURCES
-    ${CINDER-NUMOPT_PATH}/src/test.cpp
-    ${STANMATH_PATH}/math.hpp
-    nlopt.hpp
+    ${CINDER-NUMOPT_PATH}/src/CinderNumOpt.cpp
+    ${CINDER-NUMOPT_PATH}/include/CinderNumOpt.h
+    ${STANMATH_PATH}/stan/math.hpp
     )
-  add_executable(Cinder-NumOpt ${CINDER-NUMOPT_SOURCES})
+  add_library(Cinder-NumOpt ${CINDER-NUMOPT_SOURCES})
   set(CMAKE_CXX_STANDARD 14)
   find_package(Eigen3 REQUIRED)
   find_package(Boost COMPONENTS REQUIRED)
@@ -18,7 +18,10 @@ if( NOT TARGET Cinder-NumOpt )
     ${EIGEN3_INCLUDE_DIR}
     ${BOOST_INCLUDE_DIRS}
     )
-  target_include_directories(Cinder-NumOpt PUBLIC ${STANMATH_INCLUDE_DIRS})
+  target_include_directories(Cinder-NumOpt PUBLIC
+    ${STANMATH_INCLUDE_DIRS}
+    ${CINDER-NUMOPT_PATH}/include
+    )
   if( NOT TARGET cinder )
 	include( "${CINDER_PATH}/proj/cmake/configure.cmake" )
 	find_package( cinder REQUIRED PATHS
@@ -26,4 +29,5 @@ if( NOT TARGET Cinder-NumOpt )
 	  "$ENV{CINDER_PATH}/${CINDER_LIB_DIRECTORY}" )
   endif()
   target_link_libraries( Cinder-NumOpt PRIVATE cinder )
+  target_link_libraries( Cinder-NumOpt PUBLIC nlopt)
 endif()
