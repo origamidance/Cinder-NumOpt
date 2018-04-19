@@ -8,7 +8,9 @@ public:
   template <typename T>
   T operator()(const Eigen::Matrix<T,Eigen::Dynamic, 1> &x) const{
     T lp=0;
-    lp+=x.transpose()*x;
+    Eigen::Map<const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>> v(x.data(),x.size()/2,2);
+    lp+=(v.transpose()*v).norm();
+    // lp+=x.transpose()*x;
     return lp;
   }
 };
@@ -17,8 +19,9 @@ class constraint{
 public:
   template <typename T>
   T operator()(const Eigen::Matrix<T,Eigen::Dynamic, 1> &x) const{
+    Eigen::Map<const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>> v(x.data(),x.size()/2,2);
     T lp=0;
-    lp+=10-x[0];
+    lp+=10-v(0,0);
     return lp;
   }
 };
