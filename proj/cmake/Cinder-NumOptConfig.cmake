@@ -21,6 +21,8 @@ if( NOT TARGET Cinder-NumOpt )
   target_include_directories(Cinder-NumOpt PUBLIC
     ${STANMATH_INCLUDE_DIRS}
     ${CINDER-NUMOPT_PATH}/include
+    /usr/include/libalglib
+    /usr/local/include
     )
   if( NOT TARGET cinder )
 	include( "${CINDER_PATH}/proj/cmake/configure.cmake" )
@@ -29,5 +31,6 @@ if( NOT TARGET Cinder-NumOpt )
 	  "$ENV{CINDER_PATH}/${CINDER_LIB_DIRECTORY}" )
   endif()
   target_link_libraries( Cinder-NumOpt PRIVATE cinder )
-  target_link_libraries( Cinder-NumOpt PUBLIC nlopt)
+  target_link_libraries( Cinder-NumOpt PUBLIC /usr/local/lib64/libnlopt.so)
+  target_link_libraries( Cinder-NumOpt PUBLIC alglib)
 endif()

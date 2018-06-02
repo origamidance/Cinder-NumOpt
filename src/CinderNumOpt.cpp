@@ -3,16 +3,16 @@
 #include <lib/boost_1.66.0/boost/serialization/shared_ptr.hpp>
 #include <math.h>
 
-namespace NumOpt {
-Opt::Opt() { mOpt = std::make_shared<nlopt::opt>(); }
-Opt::Opt(nlopt::algorithm algo, uint n) {
-  mOpt = std::make_shared<nlopt::opt>(algo, n);
-}
-const std::shared_ptr<nlopt::opt> &Opt::getOpt() const { return mOpt; }
-void Opt::set_xtol_rel(double tol) { mOpt->set_xtol_rel(tol); }
-  void Opt::set_lower_bounds(const std::vector<double> &lb) { mOpt->set_lower_bounds(lb); }
-  void Opt::set_upper_bounds(const std::vector<double> &ub) { mOpt->set_upper_bounds(ub); }
-} // namespace NumOpt
+// namespace NumOpt {
+// Opt::Opt() { mOpt = std::make_shared<nlopt::opt>(); }
+// Opt::Opt(nlopt::algorithm algo, uint n) {
+//   mOpt = std::make_shared<nlopt::opt>(algo, n);
+// }
+// const std::shared_ptr<nlopt::opt> &Opt::getOpt() const { return mOpt; }
+// void Opt::set_xtol_rel(double tol) { mOpt->set_xtol_rel(tol); }
+//   void Opt::set_lower_bounds(const std::vector<double> &lb) { mOpt->set_lower_bounds(lb); }
+//   void Opt::set_upper_bounds(const std::vector<double> &ub) { mOpt->set_upper_bounds(ub); }
+// } // namespace NumOpt
 
 // int main(){
 
