@@ -1,3 +1,5 @@
+#ifndef CINDER_NUMOPT_H
+#define CINDER_NUMOPT_H
 #include <nlopt.hpp>
 #include <vector>
 #include <stan/math.hpp>
@@ -83,3 +85,5 @@ namespace NumOpt{
   /*   std::shared_ptr<nlopt::opt> mOpt; */
   /* }; */
 }
+
+#endif // CINDER_NUMOPT_H
