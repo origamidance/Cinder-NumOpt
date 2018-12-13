@@ -34,3 +34,6 @@
 # Build directory
 build/
 build/*
+
+# Cquery
+.cquery_cached_index/
